@@ -37,6 +37,19 @@
 			let index = this.getActiveIndex();
 			return index != -1 ? Synths.list[index] : null;
 		}
+		Synths.delete = function(synth) {
+			synth.card.container.remove();
+			synth.editor.container.remove();
+
+			let removeIndex = Synths.list.indexOf(synth);
+			let activeIndex = Synths.getActiveIndex();
+			Synths.list.splice(removeIndex, 1);
+
+			// If removing active synth, choose next lowest synth
+			if (removeIndex == activeIndex && Synths.list.length > 0) {
+				Synths.list[activeIndex == 0 ? 0 : activeIndex - 1].open();
+			}
+		}
 
 		let AppContainer = document.getElementById('synth-container');
 		let SynthCardContainer = document.getElementById('synth-card-container');
@@ -44,40 +57,22 @@
 
 		document.getElementById('add-synth').onclick = function() {
 			let synth = new SynthController();
-			synth.card.exit.onmouseup = () => {
-				synth.card.container.remove();
-				synth.editor.container.remove();
-
-				let removeIndex = Synths.list.indexOf(synth);
-				let activeIndex = Synths.getActiveIndex();
-				Synths.list.splice(removeIndex, 1);
-
-				// If removing active synth, choose next lowest synth
-				if (removeIndex == activeIndex && Synths.list.length > 0) {
-					Synths.list[activeIndex == 0 ? 0 : activeIndex - 1].open();
-				}
-			}
 			Synths.list.push(synth);
 			synth.open();
 		}
 
-		// window.onkeypress = (event) => {
-		// 	AppContainer.style.opacity = event.key == '0' ? '30%' : '100%';
-		// }
-
 		function FrequenciesController(container) {
-			let frequencies_container = document.createElement('div');
-			frequencies_container.className = 'flex-container-center';
-			frequencies_container.style.width = '100%';
+			this.container = document.createElement('div');
+			this.container.className = 'flex-container-center';
+			this.container.style.width = '100%';
 
-			let title = document.createElement('div');
-			title.className = 'txt-m gray';
-			title.innerHTML = 'Frequencies';
+			this.title = document.createElement('div');
+			this.title.className = 'txt-m gray';
+			this.title.innerHTML = 'Frequencies';
 
-			frequencies_container.appendChild(title);
-			container.appendChild(frequencies_container);
-
-			return frequencies_container;
+			this.container.appendChild(this.title);
+			
+			container.appendChild(this.container);
 		}
 
 		function SynthEditor(synth_controller) {
@@ -101,7 +96,9 @@
 				'Base Frequency', 
 				'440 hz', 
 				[/^[a-gA-G][0-9]+$/, /^[0-9]+\s*(hz)?$/], // Sci Pitch and Hertz Notation
-				(value) => synth_controller.synth.set_base(parseFloat(value)),
+				(value) => {
+					synth_controller.synth.set_base(parseFloat(value));
+				},
 				'Update',
 				(value) => alert('Invalid input: ' + value)
 			);
@@ -110,7 +107,9 @@
 				'Number of divisions',
 				'12',
 				[/^\d+$/],
-				(value) => synth_controller.synth.set_divisions(parseInt(value)),
+				(value) => {
+					synth_controller.synth.set_divisions(parseInt(value));
+				},
 				'Update',
 				(value) => alert('Invalid input: ' + value)
 			);
@@ -118,29 +117,27 @@
 			this.container.appendChild(this.base_input);
 			this.container.appendChild(this.multiplier_input);
 
-			this.frequencies = FrequenciesController(this.container);
+			this.frequencies = new FrequenciesController(this.container);
 
 			SynthEditorContainer.appendChild(this.container);
 		}
 
 		function SynthCard(synth_controller) {
 			this.container = document.createElement('div');
-			
+			this.container.className = 'relative';
+
 			this.body = document.createElement('button');
-			this.body.className = 'button-l synth-card white';
+			this.body.className = 'button-l synth-card white'
 			this.body.style.backgroundColor = Styles.synth_cardFG;
 			this.body.innerHTML = synth_controller.id;
 
-			this.exit = document.createElement('div');
-			this.exit.className = 'exit-box';
-			let exit_img = document.createElement('img');
-			exit_img.className = 'exit';
-			exit_img.src = 'exit.png';
-			
-			this.body.appendChild(this.exit);
-			this.body.appendChild(exit_img);
+			this.exit = document.createElement('img');
+			this.exit.className = 'exit';
+			this.exit.src = 'exit.png';
 
-			this.container.appendChild(this.body)
+			this.container.appendChild(this.body);
+			this.container.appendChild(this.exit);
+
 			SynthCardContainer.appendChild(this.container);
 		}
 
@@ -161,10 +158,14 @@
 				this.editor.title.oninput = () => { this.updateCard() };
 				this.card.body.onclick = () => { this.open() };
 				this.card.container.onmouseover = () => {
-					if (!this.active) this.card.body.style.backgroundColor = Styles.yellow + 'c0';
+					if (!this.active) this.card.body.style.backgroundColor = Styles.synth_cardFG + '80';
 				};
 				this.card.container.onmouseleave   = () => {
 					if (!this.active) this.card.body.style.backgroundColor = Styles.synth_cardBG;
+				}
+				this.card.exit.onmouseup = () => {
+					console.log("deleting");
+					Synths.delete(this);
 				}
 			}
 
@@ -176,7 +177,7 @@
 				for (let synth of Synths.list) {
 					synth.active = synth.card.body.innerHTML == this.card.body.innerHTML;
 					synth.editor.container.style.display = synth.active ? 'flex' : 'none';
-					synth.card.body.style.backgroundColor = synth.active ? Styles.blue : Styles.synth_cardBG;
+					synth.card.body.style.backgroundColor = synth.active ? Styles.synth_cardFG : Styles.synth_cardBG;
 				}
 				return this;
 			}

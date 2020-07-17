@@ -8,7 +8,7 @@ let Styles = {
 }
 
 Styles.synth_cardBG = Styles.gray;
-Styles.synth_cardFG = Styles.green;
+Styles.synth_cardFG = Styles.blue;
 
 const isIterable = (object) => object != null && typeof object[Symbol.iterator] === 'function';
 

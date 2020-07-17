@@ -1,29 +1,3 @@
-/* html, body {
-    overflow : hidden;
-} */
-
-/* .synth-title {
-    border: none;
-    display: inline;
-    font-family: inherit;
-    font-size: inherit;
-    padding: none;
-}
-
-.synth-title:focus {
-    outline : none;
-} */
-
-/* #myCanvas{
-    position:fixed;
-    top:0;
-    right:0;
-    bottom:0;
-    left:0;
-} */
-
-/* .scale { display : none; } */
-
 /***** GENERAL SPECS *****/
 
 body { background : #9a9a9aff; }
@@ -40,7 +14,9 @@ html, body, canvas, .scene, .synths {
     margin : 10px;
 }
 
-
+.relative {
+    position : relative;
+}
 
 .submitter {
     color : white;
@@ -80,25 +56,19 @@ html, body, canvas, .scene, .synths {
    -ms-animation: fadeIn ease .5s;
 }
 
-[class^=exit] {
+.exit {
     position : absolute;
-    
-}
-
-.exit-box {
-    top : -5px;
-    right : -5px;
+    background-color: #86eda6;
+    top : 2px;
+    right : 2px;
     width : 20px;
     height : 20px;
     border-radius : 5px;
-    background-color: #e19191;
 }
 
-.exit {
-    top : -0.5px;
-    right : -1.1px;
-    width : 12px;
-    height : 10px;
+.exit:hover {
+    background-color: #e19191;
+    cursor : pointer;
 }
 
 
@@ -128,14 +98,17 @@ html, body, canvas, .scene, .synths {
 .hspace-s { padding : 8px; }
 
 /* COLORS */ 
-.bg-blue  { background-color : #89cff0; }
-.blue     {            color : #89cff0; }
-.bg-white { background-color : #ffffff; }
-.white    {            color : #ffffff; }
-.bg-gray  { background-color : #9a9a9aff; }
-.gray     {            color : #9a9a9aff; }
-.bg-yellow  { background-color : #fdfd96; }
-.yellow     {            color : #fdfd96; }
+.bg-blue    { background-color : #89cff0;   }
+.blue       {            color : #89cff0;   }
+.bg-white   { background-color : #ffffff;   }
+.white      {            color : #ffffff;   }
+.bg-gray    { background-color : #9a9a9aff; }
+.gray       {            color : #9a9a9aff; }
+.bg-yellow  { background-color : #fdfd96;   }
+.yellow     {            color : #fdfd96;   }
+.bg-green   { background-color : #86eda6;   }
+.green      {            color : #86eda6;   }
+
 
 /* BUTTONS */
 [class^=button] {
@@ -170,6 +143,10 @@ html, body, canvas, .scene, .synths {
     box-shadow: 2px 2px #000000;
 }
 
+[class^=button]::selection {
+    text-decoration: none;
+}
+
 /* TEXT STYLES */
 [class^=txt]{
     text-align: center;
@@ -182,7 +159,7 @@ html, body, canvas, .scene, .synths {
     cursor: default;
 }
 
-.txt-s { font-size : 25px; }
+.txt-xs { font-size : 15px; }
 .txt-m { font-size : 50px; }
 .txt-l { font-size : 60px; }
 
