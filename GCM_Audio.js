@@ -132,27 +132,36 @@ class ETSynth {
     }
 
     constructor(divisions = 12, opts = {}) {
+        this.divisions = divisions;
         this.settings = {...ETSynth.default};
         Object.keys(opts).forEach(key => { this.settings[key] = opts[key]; });
 
-        this.set_divisions(divisions);
         this.tone = new Tone.PolySynth(this.settings.polyphony, Tone.FMSynth, {
             modulation: {
                 type: 'sine'
             }
         }).toMaster();
+
+        this.set_base        = (frequency) => this.set_scale(this.divisions, frequency);
+        this.set_divisions   = (divisions) => this.set_scale(divisions);
+
+        this.set_scale();
     }
 
-    set_divisions(val) {
-        if (typeof val != 'number' || val == 0) {
+    set_scale(divisions = this.divisions, base = this.settings.base) {
+        if (typeof divisions != 'number' || divisions == 0) {
             console.log("Invalid division assignment");
             return;
         }
 
+        this.divisions = divisions;
+        this.settings.base = base;
+
         this.notes = [];
-        let ratio = Math.pow(2, 1 / val);
-        for (var i = 0; i < Math.floor(val); ++i) {
-            this.notes.push(this.settings.base * Math.pow(ratio, i + 1));
+        let ratio = Math.pow(2, 1 / Math.floor(this.divisions));
+        for (var i = 0; i < Math.floor(this.divisions) + 1; ++i) {
+            let frequency = this.settings.base * Math.pow(ratio, i);
+            this.notes.push(frequency);
         }
     }
 

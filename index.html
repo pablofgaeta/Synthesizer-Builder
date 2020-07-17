@@ -11,75 +11,67 @@
 	<script src='utilities.js'></script>
 	<script src='Libraries/name.js'></script>
 	<script src='Libraries/Tone.js'></script>
+	<script src='GCM_Audio.js'></script>
 </head>
 <body>
 	<center id='synth-container'>
 		<div id='app-title' class='flex-container-center bg-white'>
 			<div class='txt-l gray'>Custom Synths</div>
-			<div class="hspace-s"></div>
-			<button id='add-synth' class='button-l state-button'>Create Synth</button>
+			<button id='add-synth' class='button-l trigger'>Create Synth</button>
 		</div>
-		<div id='synth-card-container' class='flex-container-center bg-blue fade-in' style='display : none;'>
-
-		</div>
-		<div id='synth-editor-container' class='flex-container-center bg-white fade-in' style='display : none;'>
-
-		</div>
+		<div id='synth-card-container' class='flex-container-center fade-in'></div>
+		<div id='synth-editor-container' class='flex-container-center bg-white fade-in'></div>
 	</center>
 
 	<script>
-		let Synths = [];
-		
+		let Synths = {}
+		Synths.list = [];
+		Synths.getActiveIndex = function() {
+			let index = -1;
+			for (let i = 0; i < Synths.list.length; ++i) {
+				if (Synths.list[i].active) index = i;
+			}
+			return index;
+		}
+		Synths.getActive = function() {
+			let index = this.getActiveIndex();
+			return index != -1 ? Synths.list[index] : null;
+		}
+
 		let AppContainer = document.getElementById('synth-container');
 		let SynthCardContainer = document.getElementById('synth-card-container');
 		let SynthEditorContainer = document.getElementById('synth-editor-container');
 
 		document.getElementById('add-synth').onclick = function() {
-			document.getElementById("synth-card-container").style.display = 'flex';
-			Synths.push(new SynthController());
+			let synth = new SynthController();
+			synth.card.exit.onmouseup = () => {
+				synth.card.container.remove();
+				synth.editor.container.remove();
+
+				let removeIndex = Synths.list.indexOf(synth);
+				let activeIndex = Synths.getActiveIndex();
+				Synths.list.splice(removeIndex, 1);
+
+				// If removing active synth, choose next lowest synth
+				if (removeIndex == activeIndex && Synths.list.length > 0) {
+					Synths.list[activeIndex == 0 ? 0 : activeIndex - 1].open();
+				}
+			}
+			Synths.list.push(synth);
+			synth.open();
 		}
 
-		function SynthInputs(container) {
-			this.base_frequency = new Tone.Frequency('440 hz');
-
-			this.base_input = InputField (
-				'Base Frequency', 
-				'440 hz', 
-				[/^[a-gA-G][0-9]+$/, /^[0-9]+\s*(hz)?$/], // Sci Pitch and Hertz Notation
-				(value) => console.log(value),
-				'Update',
-				(value) => alert('Invalid input: ' + value)
-			);
-
-			this.multiplier_input = InputField (
-				'Frequency Multipliers', 
-				'1', 
-				[/^(\s*([0-9]*.?[0-9]+)+\s*,?\s*)*$/], // Sci Pitch and Hertz Notation
-				(value) => {
-					let ratios = value.replace(/\s/g, '').split(',').map(str => parseFloat(str));
-					console.log(ratios);
-				},
-				'Update',
-				(value) => alert('Invalid input: ' + value)
-			);
-
-			container.appendChild(this.base_input);
-			container.appendChild(this.multiplier_input);
-
-			// return { get : () => base_frequency }
-		}
-
-		window.onkeypress = (event) => {
-			AppContainer.style.opacity = event.key == '0' ? '30%' : '100%';
-		}
+		// window.onkeypress = (event) => {
+		// 	AppContainer.style.opacity = event.key == '0' ? '30%' : '100%';
+		// }
 
 		function FrequenciesController(container) {
 			let frequencies_container = document.createElement('div');
-			frequencies_container.className = 'flex-container-center bg-blue';
+			frequencies_container.className = 'flex-container-center';
 			frequencies_container.style.width = '100%';
 
 			let title = document.createElement('div');
-			title.className = 'txt-m white';
+			title.className = 'txt-m gray';
 			title.innerHTML = 'Frequencies';
 
 			frequencies_container.appendChild(title);
@@ -88,16 +80,14 @@
 			return frequencies_container;
 		}
 
-		function SynthEditor(id) {
+		function SynthEditor(synth_controller) {
 			this.container = document.createElement('div');
 			this.container.className = 'flex-container-center synth-editor';
-			this.container.style.display = 'none';
 
 			this.title = document.createElement('div');
 			this.title.className = 'txt-m synth-title gray editable';
-			this.title.style.width = '100%';
 			this.title.contentEditable = 'true';
-			this.title.innerHTML = id;
+			this.title.innerHTML = synth_controller.id;
 			this.title.onkeydown = (event) => {
 				if (['Return', 'Enter'].includes(event.key)) event.preventDefault();
 			}
@@ -107,49 +97,92 @@
 			horizontal.className = 'rule';
 			this.container.appendChild(horizontal);
 
-			this.inputs = new SynthInputs(this.container);
+			this.base_input = InputField (
+				'Base Frequency', 
+				'440 hz', 
+				[/^[a-gA-G][0-9]+$/, /^[0-9]+\s*(hz)?$/], // Sci Pitch and Hertz Notation
+				(value) => synth_controller.synth.set_base(parseFloat(value)),
+				'Update',
+				(value) => alert('Invalid input: ' + value)
+			);
+
+			this.multiplier_input = InputField (
+				'Number of divisions',
+				'12',
+				[/^\d+$/],
+				(value) => synth_controller.synth.set_divisions(parseInt(value)),
+				'Update',
+				(value) => alert('Invalid input: ' + value)
+			);
+
+			this.container.appendChild(this.base_input);
+			this.container.appendChild(this.multiplier_input);
+
 			this.frequencies = FrequenciesController(this.container);
 
 			SynthEditorContainer.appendChild(this.container);
 		}
 
-		function createSynthCard(id) {
-			let element = document.createElement('button');
-			element.className = 'button-l synth-card state-button';
-			element.innerHTML = id;
+		function SynthCard(synth_controller) {
+			this.container = document.createElement('div');
+			
+			this.body = document.createElement('button');
+			this.body.className = 'button-l synth-card white';
+			this.body.style.backgroundColor = Styles.synth_cardFG;
+			this.body.innerHTML = synth_controller.id;
 
-			SynthCardContainer.appendChild(element);
+			this.exit = document.createElement('div');
+			this.exit.className = 'exit-box';
+			let exit_img = document.createElement('img');
+			exit_img.className = 'exit';
+			exit_img.src = 'exit.png';
+			
+			this.body.appendChild(this.exit);
+			this.body.appendChild(exit_img);
 
-			return element;
+			this.container.appendChild(this.body)
+			SynthCardContainer.appendChild(this.container);
+		}
+
+		AppContainer.onkeypress = (event) => {
+			Synths.getActive().trigger(event.key);
 		}
 
 
 		class SynthController {
 			constructor(id = generateName()) {
-				this.synth_card = createSynthCard(id);
-				this.synth_editor = new SynthEditor(id);
+				this.id = id;
+				this.active = true;
+				this.synth = new ETSynth();
 
-				this.synth_editor.title.oninput = () => {
-					this.updateCard();
+				this.card = new SynthCard(this);
+				this.editor = new SynthEditor(this);
+
+				this.editor.title.oninput = () => { this.updateCard() };
+				this.card.body.onclick = () => { this.open() };
+				this.card.container.onmouseover = () => {
+					if (!this.active) this.card.body.style.backgroundColor = Styles.yellow + 'c0';
 				};
-				this.synth_card.onclick = () => {
-					document.getElementById('synth-editor-container').style.display = 'flex';
-					this.openSynth();
-				};
-			}
-
-			get name() { return this.element.id; }
-
-			openSynth() {
-				for (let synth of Synths) {
-					let target = synth.synth_card.innerHTML == this.synth_card.innerHTML;
-					synth.synth_editor.container.style.display = target ? 'flex' : 'none';
-					synth.synth_card.style.backgroundColor = target ? '#e19191': '#9a9a9aff';
+				this.card.container.onmouseleave   = () => {
+					if (!this.active) this.card.body.style.backgroundColor = Styles.synth_cardBG;
 				}
 			}
 
+			trigger(key) {
+				this.synth.play(key);
+			}
+
+			open() {
+				for (let synth of Synths.list) {
+					synth.active = synth.card.body.innerHTML == this.card.body.innerHTML;
+					synth.editor.container.style.display = synth.active ? 'flex' : 'none';
+					synth.card.body.style.backgroundColor = synth.active ? Styles.blue : Styles.synth_cardBG;
+				}
+				return this;
+			}
+
 			updateCard() {
-				this.synth_card.innerHTML = this.synth_editor.title.innerHTML;
+				this.id = this.card.body.innerHTML = this.editor.title.innerHTML;
 			}
 		}
 	</script>

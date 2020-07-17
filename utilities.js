@@ -4,8 +4,11 @@ let Styles = {
    gray : '#9a9a9a',
    yellow : '#fdfd96',
    red : '#e19191',
-   green : '#86eda6'
+   green : '#86eda6',
 }
+
+Styles.synth_cardBG = Styles.gray;
+Styles.synth_cardFG = Styles.green;
 
 const isIterable = (object) => object != null && typeof object[Symbol.iterator] === 'function';
 
@@ -29,8 +32,6 @@ function InputField(titleName, initVal, validators, callback, buttonName = 'Subm
 
    let container = document.createElement('div');
    container.className = 'flex-container-center';
-   // container.style.outline = '2px solid ' + Styles.red;
-   // container.style.margin = '5px';
 
    let input_container = document.createElement('div');
    input_container.className = 'flex-container-center';
@@ -73,7 +74,6 @@ function InputField(titleName, initVal, validators, callback, buttonName = 'Subm
    };
    submit.onclick = () => VALID ? callback(input.value) : rejectCallback(input.value);
 
-   // input_container.appendChild(title);
    input_container.appendChild(input);
    input_container.appendChild(submit);
 
