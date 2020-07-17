@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+	
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script> -->
+</head>
+
+<body>
+<!-- <center id='Tuning-Picker' class='scene'>
+		<div class='txt-l'>Pick A Tuning System</div>
+		<button id = 'JT' class='button-l'>Just Intonation</button>
+		<div class='hspace-m'></div>
+		<button id = 'ET' class='button-l'>Equal Temperament</button>
+		<div class='txt-l'>Base Frequency</div>
+		<div class='txt-s'>Specified in midi (e.g. 'A4') or scientific (e.g. '440hz') notation</div>
+		<input id='frequency' class='input-l' style='width : 250px;'></input>
+	</center>
+	<center id = 'Scale-Constructor' class='scene'>
+		<center id='Just-Ratio-Picker' class='scale'>
+			<div class='txt-l'>Enter frequency multipliers</div>
+			<input id='jr-input' class='input-l'></input>
+			<div class='txt-m'>Examples</div>
+			<div class='txt-s' style='justify-content: left;'>First five partials : [1, 2, 3, 4, 5] </div>
+			<div class='txt-s' style='justify-content: left;'>minor pentatonic : [1, 32/27, 4/3, 3/2, 16/9, 2]</div>
+			<button class='button-l scale-submit'>submit</button>
+		</center>
+		<center id='Equal-Tempered-Picker' class='scale'>
+			<div class='txt-l'>How many tones?</div>
+			<input id='et-input' class='input-m'></input>
+			<div class='txt-m'>Example</div>
+			<div class='txt-m'>Western tuning is 12 tone</div>
+			<button class='button-l scale-submit'>submit</button>
+		</center>
+	</center>
+	<script>
+		let primaryColor = 'rgb(225, 145, 145)';
+		let secondaryColor = 'rgb(137,207,240)'
+		window.onbeforeunload = window.onload = () => window.scroll(0,0);
+
+		let TuningPicker = document.getElementById('Tuning-Picker');
+		// let TuningSubmit = document.getElementById('Tuning-Submit');
+		let JTButton = document.getElementById('JT');
+		let ETButton = document.getElementById('ET');
+
+		let JTPicker = document.getElementById('Just-Ratio-Picker');
+		let ETPicker = document.getElementById('Equal-Tempered-Picker');
+
+		let ScaleConstructor = document.getElementById('Scale-Constructor');
+		let animation_time = 100;
+
+		let scale_list_input = null;
+		JTButton.onclick = () => {
+			scale_list_input = document.getElementById('jr-input');
+			choose_from_children(ScaleConstructor, JTPicker);
+			JTButton.style.backgroundColor = primaryColor;
+			ETButton.style.backgroundColor = secondaryColor;
+		}
+		ETButton.onclick = () => {
+			scale_list_input = document.getElementById('et-input');
+			choose_from_children(ScaleConstructor, ETPicker);
+			ETButton.style.backgroundColor = primaryColor;
+			JTButton.style.backgroundColor = secondaryColor;
+		}
+
+		let scaleSubmits = Array.from(document.getElementsByClassName('scale-submit'));
+
+		scaleSubmits.forEach(submit => {
+			submit.onclick = () => {
+				let frequency = document.getElementById('frequency').value;
+				let scale_list = scale_list_input.value;
+				if (scale_list != '' && frequency) {
+					registerScale(frequency, scale_list);
+				}
+				else {
+					alert('Fill in all fields.');
+				}
+			};
+		})
+
+		function registerScale(freq, scaleStr) {
+			console.log(freq, scaleStr);
+		}
+
+		// TuningSubmit.onclick = () => {
+		// 	let frequency = document.getElementById('frequency').value;
+		// 	if (scale_chosen && frequency) scroll_vertical(ScaleConstructor.offsetTop);
+		// 	else              alert('Choose a scale and frequency.');
+		// }
+
+		function choose_from_children(container, target) {
+			for (let i = 0; i < container.children.length; ++i) {
+				let child = container.children[i];
+				child.style.display = child == target ? 'block' : 'none';
+			}
+		}
+
+		function scroll_vertical(y, ms = animation_time, step = 0) {
+			let delta = (y - window.pageYOffset) / ( ms * 15 );
+			let f = () => delta * (step++) + window.pageYOffset;
+
+			let scrolling_up = y > window.pageYOffset;
+			let id = setInterval(frame, 5);
+			function frame() {
+				let new_y = f();
+				window.scroll(0, new_y);
+				if (scrolling_up && new_y >= y) finish();
+				if (!scrolling_up && new_y <= y) finish();
+			}
+			function finish() {
+				window.scroll(0, y);
+				clearInterval(id);
+			}
+		}
+	</script> -->
+
+<!-- <script>
+	function transition(exit, enter, time = 100) {
+			fadeOut(exit, time / 2);
+			fadeIn(enter, time / 2);
+		}
+
+		function fadeOut(element, ms) {
+			let delta = 5 / (ms);
+			element.style.opacity = 1;
+			let id = setInterval(frame, 5);
+			function frame() {
+				element.style.opacity = parseFloat(element.style.opacity) - delta;
+				if (element.style.opacity <= 0) {
+					element.style.opacity = 0;
+					element.style.display = 'none';
+					clearInterval(id);
+				}
+			}
+		}
+
+
+		function fadeIn(element, ms) {
+			let delta = 5 / (ms);
+			element.style.display = 'block';
+			element.style.opacity = 0;
+			let id = setInterval(frame, 5);
+			function frame() {
+				element.style.opacity = parseFloat(element.style.opacity) + delta;
+				if (element.style.opacity >= 1) {
+					element.style.opacity = 1;
+					clearInterval(id);
+				}
+			}
+		}
+</script> -->
+</body>
+</html>

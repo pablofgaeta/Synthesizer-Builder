@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>p5pd</title>
+
+	<link rel="stylesheet" href="main.css">
+	<script src='utilities.js'></script>
+	<script src='Libraries/name.js'></script>
+	<script src='Libraries/Tone.js'></script>
+</head>
+<body>
+	<center id='synth-container'>
+		<div id='app-title' class='flex-container-center bg-white'>
+			<div class='txt-l gray'>Custom Synths</div>
+			<div class="hspace-s"></div>
+			<button id='add-synth' class='button-l state-button'>Create Synth</button>
+		</div>
+		<div id='synth-card-container' class='flex-container-center bg-blue fade-in' style='display : none;'>
+
+		</div>
+		<div id='synth-editor-container' class='flex-container-center bg-white fade-in' style='display : none;'>
+
+		</div>
+	</center>
+
+	<script>
+		let Synths = [];
+		
+		let AppContainer = document.getElementById('synth-container');
+		let SynthCardContainer = document.getElementById('synth-card-container');
+		let SynthEditorContainer = document.getElementById('synth-editor-container');
+
+		document.getElementById('add-synth').onclick = function() {
+			document.getElementById("synth-card-container").style.display = 'flex';
+			Synths.push(new SynthController());
+		}
+
+		function SynthInputs(container) {
+			this.base_frequency = new Tone.Frequency('440 hz');
+
+			this.base_input = InputField (
+				'Base Frequency', 
+				'440 hz', 
+				[/^[a-gA-G][0-9]+$/, /^[0-9]+\s*(hz)?$/], // Sci Pitch and Hertz Notation
+				(value) => console.log(value),
+				'Update',
+				(value) => alert('Invalid input: ' + value)
+			);
+
+			this.multiplier_input = InputField (
+				'Frequency Multipliers', 
+				'1', 
+				[/^(\s*([0-9]*.?[0-9]+)+\s*,?\s*)*$/], // Sci Pitch and Hertz Notation
+				(value) => {
+					let ratios = value.replace(/\s/g, '').split(',').map(str => parseFloat(str));
+					console.log(ratios);
+				},
+				'Update',
+				(value) => alert('Invalid input: ' + value)
+			);
+
+			container.appendChild(this.base_input);
+			container.appendChild(this.multiplier_input);
+
+			// return { get : () => base_frequency }
+		}
+
+		window.onkeypress = (event) => {
+			AppContainer.style.opacity = event.key == '0' ? '30%' : '100%';
+		}
+
+		function FrequenciesController(container) {
+			let frequencies_container = document.createElement('div');
+			frequencies_container.className = 'flex-container-center bg-blue';
+			frequencies_container.style.width = '100%';
+
+			let title = document.createElement('div');
+			title.className = 'txt-m white';
+			title.innerHTML = 'Frequencies';
+
+			frequencies_container.appendChild(title);
+			container.appendChild(frequencies_container);
+
+			return frequencies_container;
+		}
+
+		function SynthEditor(id) {
+			this.container = document.createElement('div');
+			this.container.className = 'flex-container-center synth-editor';
+			this.container.style.display = 'none';
+
+			this.title = document.createElement('div');
+			this.title.className = 'txt-m synth-title gray editable';
+			this.title.style.width = '100%';
+			this.title.contentEditable = 'true';
+			this.title.innerHTML = id;
+			this.title.onkeydown = (event) => {
+				if (['Return', 'Enter'].includes(event.key)) event.preventDefault();
+			}
+			this.container.appendChild(this.title);
+
+			let horizontal = document.createElement('div');
+			horizontal.className = 'rule';
+			this.container.appendChild(horizontal);
+
+			this.inputs = new SynthInputs(this.container);
+			this.frequencies = FrequenciesController(this.container);
+
+			SynthEditorContainer.appendChild(this.container);
+		}
+
+		function createSynthCard(id) {
+			let element = document.createElement('button');
+			element.className = 'button-l synth-card state-button';
+			element.innerHTML = id;
+
+			SynthCardContainer.appendChild(element);
+
+			return element;
+		}
+
+
+		class SynthController {
+			constructor(id = generateName()) {
+				this.synth_card = createSynthCard(id);
+				this.synth_editor = new SynthEditor(id);
+
+				this.synth_editor.title.oninput = () => {
+					this.updateCard();
+				};
+				this.synth_card.onclick = () => {
+					document.getElementById('synth-editor-container').style.display = 'flex';
+					this.openSynth();
+				};
+			}
+
+			get name() { return this.element.id; }
+
+			openSynth() {
+				for (let synth of Synths) {
+					let target = synth.synth_card.innerHTML == this.synth_card.innerHTML;
+					synth.synth_editor.container.style.display = target ? 'flex' : 'none';
+					synth.synth_card.style.backgroundColor = target ? '#e19191': '#9a9a9aff';
+				}
+			}
+
+			updateCard() {
+				this.synth_card.innerHTML = this.synth_editor.title.innerHTML;
+			}
+		}
+	</script>
+</body>
+</html>
+
+
