@@ -58,7 +58,7 @@ html, body, canvas, .scene, .synths {
 
 .exit {
     position : absolute;
-    background-color: #86eda6;
+    background-color: #e19191;
     top : 2px;
     right : 2px;
     width : 20px;
@@ -160,6 +160,7 @@ html, body, canvas, .scene, .synths {
 }
 
 .txt-xs { font-size : 15px; }
+.txt-s { font-size : 25px; }
 .txt-m { font-size : 50px; }
 .txt-l { font-size : 60px; }
 
@@ -173,9 +174,9 @@ html, body, canvas, .scene, .synths {
     padding : 10px;
 }
 
-.input-s { min-width : 25%; font-size : 25px; }
-.input-m { min-width : 50%; font-size : 50px; }
-.input-l { min-width : 80%; font-size : 60px; }
+.input-s { width : 25%; font-size : 25px; }
+.input-m { width : 50%; font-size : 50px; }
+.input-l { width : 80%; font-size : 60px; }
 
 
 /* Fades */

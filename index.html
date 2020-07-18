@@ -5,7 +5,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<title>p5pd</title>
+	<title>Synthesizer-Builder</title>
 
 	<link rel="stylesheet" href="main.css">
 	<script src='utilities.js'></script>
@@ -38,8 +38,7 @@
 			return index != -1 ? Synths.list[index] : null;
 		}
 		Synths.delete = function(synth) {
-			synth.card.container.remove();
-			synth.editor.container.remove();
+			synth.close();
 
 			let removeIndex = Synths.list.indexOf(synth);
 			let activeIndex = Synths.getActiveIndex();
@@ -97,7 +96,16 @@
 				'440 hz', 
 				[/^[a-gA-G][0-9]+$/, /^[0-9]+\s*(hz)?$/], // Sci Pitch and Hertz Notation
 				(value) => {
-					synth_controller.synth.set_base(parseFloat(value));
+					let frequency;
+					if (/^[a-gA-G][0-9]+$/.test(value)) {
+						frequency = new Tone.Frequency(value);
+						console.log(frequency.toFrequency());
+					}
+					else if (/^[0-9]+\s*(hz)?$/.test(value)) {
+						frequency = parseFloat(value);
+						console.log(frequency);
+					}
+					synth_controller.synth.set_base(frequency);
 				},
 				'Update',
 				(value) => alert('Invalid input: ' + value)
@@ -141,10 +149,19 @@
 			SynthCardContainer.appendChild(this.container);
 		}
 
-		AppContainer.onkeypress = (event) => {
-			Synths.getActive().trigger(event.key);
-		}
+		AppContainer.onkeydown = (event) => Synths.getActive().synth.attack(event.key);
+		AppContainer.onkeyup = (event) => Synths.getActive().synth.release(event.key);
 
+		AppContainer.onkeypress = (event) => {
+			switch (event.key) {
+				case 'x' :
+					Synths.getActive().synth.increment_octave();
+					break;
+				case 'z' :
+					Synths.getActive().synth.decrement_octave();
+					break;
+			}
+		}
 
 		class SynthController {
 			constructor(id = generateName()) {
@@ -158,26 +175,27 @@
 				this.editor.title.oninput = () => { this.updateCard() };
 				this.card.body.onclick = () => { this.open() };
 				this.card.container.onmouseover = () => {
-					if (!this.active) this.card.body.style.backgroundColor = Styles.synth_cardFG + '80';
+					if (!this.active)
+						this.card.body.style.backgroundColor = Styles.synth_cardFG + '80';
 				};
 				this.card.container.onmouseleave   = () => {
-					if (!this.active) this.card.body.style.backgroundColor = Styles.synth_cardBG;
+					if (!this.active)
+						this.card.body.style.backgroundColor = Styles.synth_cardBG;
 				}
-				this.card.exit.onmouseup = () => {
-					console.log("deleting");
-					Synths.delete(this);
-				}
+				this.card.exit.onmouseup = () => Synths.delete(this);
 			}
 
-			trigger(key) {
-				this.synth.play(key);
+			close() {
+				this.card.container.remove();
+				this.editor.container.remove();
 			}
 
 			open() {
-				for (let synth of Synths.list) {
-					synth.active = synth.card.body.innerHTML == this.card.body.innerHTML;
-					synth.editor.container.style.display = synth.active ? 'flex' : 'none';
-					synth.card.body.style.backgroundColor = synth.active ? Styles.synth_cardFG : Styles.synth_cardBG;
+				for (let synth_controller of Synths.list) {
+					synth_controller.active = synth_controller.card.body.innerHTML == this.card.body.innerHTML;
+					if (!synth_controller.active) synth_controller.synth.releaseAll();
+					synth_controller.editor.container.style.display = synth_controller.active ? 'flex' : 'none';
+					synth_controller.card.body.style.backgroundColor = synth_controller.active ? Styles.synth_cardFG : Styles.synth_cardBG;
 				}
 				return this;
 			}

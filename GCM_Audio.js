@@ -133,6 +133,9 @@ class ETSynth {
 
     constructor(divisions = 12, opts = {}) {
         this.divisions = divisions;
+        this.relative_octave = 1; // relative octave multiplier
+        this.playing = {}; // Stack of key -> note mappings
+
         this.settings = {...ETSynth.default};
         Object.keys(opts).forEach(key => { this.settings[key] = opts[key]; });
 
@@ -144,6 +147,14 @@ class ETSynth {
 
         this.set_base        = (frequency) => this.set_scale(this.divisions, frequency);
         this.set_divisions   = (divisions) => this.set_scale(divisions);
+        this.increment_octave = () => {
+            this.relative_octave *= 2;
+            this.set_scale();
+        };
+        this.decrement_octave = () => {
+            this.relative_octave /= 2;
+            this.set_scale();
+        };
 
         this.set_scale();
     }
@@ -160,7 +171,7 @@ class ETSynth {
         this.notes = [];
         let ratio = Math.pow(2, 1 / Math.floor(this.divisions));
         for (var i = 0; i < Math.floor(this.divisions) + 1; ++i) {
-            let frequency = this.settings.base * Math.pow(ratio, i);
+            let frequency = this.relative_octave * this.settings.base * Math.pow(ratio, i);
             this.notes.push(frequency);
         }
     }
@@ -172,6 +183,26 @@ class ETSynth {
                 this.notes[index] + 'hz', this.settings.release
             );
         }
+    }
+
+    attack(key) {
+        let index = ETSynth.keys.indexOf(key);
+        if (index != -1 && index < this.notes.length &&
+            !this.playing.hasOwnProperty(key) ) {
+            this.playing[key] = this.notes[index] + 'hz';
+            this.tone.triggerAttack(this.notes[index] + 'hz');
+        }
+    }
+
+    release(key) {
+        if (this.playing.hasOwnProperty(key)) {
+            this.tone.triggerRelease(this.playing[key]);
+            delete this.playing[key];
+        }
+    }
+
+    releaseAll() {
+        this.tone.releaseAll();
     }
 }
 

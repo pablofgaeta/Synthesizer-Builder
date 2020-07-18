@@ -44,7 +44,6 @@ function InputField(titleName, initVal, validators, callback, buttonName = 'Subm
 
    let input = document.createElement('input');
    input.className = 'input white';
-   input.style.width = '50%';
    input.style.backgroundColor = validInputColor;
    input.value = initVal;
    input.oninput = () => {
