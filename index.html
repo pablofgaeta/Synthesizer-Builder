@@ -17,8 +17,8 @@
 <body>
 	<center id='app-container'>
 		<div id='app-title' class='flex-container-center bg-white'>
-			<div class='txt-l gray'>Custom Synths</div>
-			<button id='add-synth' class='button-l trigger'>Create Synth</button>
+			<div class='txt-l gray no-select'>Custom Synths</div>
+			<button id='add-synth' class='button-l trigger no-select'>Create Synth</button>
 		</div>
 		<div id='synth-card-container' class='flex-container-center fade-in'></div>
 		<div id='synth-editor-container' class='flex-container-center bg-white fade-in'></div>
@@ -30,28 +30,26 @@
 		let SynthEditorContainer = document.getElementById('synth-editor-container');
 
 		document.getElementById('add-synth').onclick = function() {
-			SynthBuilder.Synths.create(SynthCardContainer, SynthEditorContainer);
+			SynthBuilder.create(SynthCardContainer, SynthEditorContainer);
 		}
 
 		window.onkeydown = (event) => {
-			SynthBuilder.Synths.getActive().synth.attack(event.key);
+			SynthBuilder.active().synth.attack(event.key);
 		}
 		window.onkeyup = (event) => {
-			SynthBuilder.Synths.getActive().synth.release(event.key);
+			SynthBuilder.active().synth.release(event.key);
 		}
 
-		AppContainer.onkeypress = (event) => {
+		window.onkeypress = (event) => {
 			switch (event.key) {
 				case 'x' :
-					SynthBuilder.Synths.getActive().synth.increment_octave();
+					SynthBuilder.active().synth.increment_octave();
 					break;
 				case 'z' :
-					SynthBuilder.Synths.getActive().synth.decrement_octave();
+					SynthBuilder.active().synth.decrement_octave();
 					break;
 			}
 		}
 	</script>
 </body>
 </html>
-
-

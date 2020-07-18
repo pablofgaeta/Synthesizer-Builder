@@ -71,6 +71,17 @@ html, body, canvas, .scene, .synths {
     cursor : pointer;
 }
 
+.frequency-mapping {
+    color : white;
+    background-color : #e19191;
+    text-align : center;
+    vertical-align : center;
+    border-radius : 10px;
+    padding : 10px 10px;
+    margin : 5px;
+    border : none;
+}
+
 .frequency-pad {
     background-color : #9a9a9a;
     padding : 25px;
@@ -78,12 +89,25 @@ html, body, canvas, .scene, .synths {
     border-radius : 10px;
 }
 
-.frequency-pad:hover {
+.frequency-pad:hover, .frequency-pad:active {
     background-color : #89cff0;
 }
 
 .synth-editor {
     width : 100%;
+}
+
+.no-select,
+.pad-container > *,
+.synth-card-container > *
+{
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
 }
 
 

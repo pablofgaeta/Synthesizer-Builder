@@ -175,7 +175,7 @@ class ETSynth {
 
         this.notes = [];
         let ratio = Math.pow(2, 1 / Math.floor(this.divisions));
-        for (var i = 0; i < Math.floor(this.divisions) + 1; ++i) {
+        for (var i = 0; i < Math.floor(this.divisions); ++i) {
             let frequency = this.relative_octave * this.settings.base * Math.pow(ratio, i);
             this.notes.push(frequency);
         }
@@ -192,10 +192,11 @@ class ETSynth {
 
     attack(key) {
         let index = ETSynth.keys.indexOf(key);
-        if (index != -1 && index < this.notes.length &&
-            !this.playing.hasOwnProperty(key) ) {
-            this.playing[key] = this.notes[index] + 'hz';
-            this.tone.triggerAttack(this.notes[index] + 'hz');
+        if (index != -1 && !this.playing.hasOwnProperty(key)) {
+            let relative_octave = Math.pow(2, Math.floor(index / this.notes.length));
+            let note = this.notes[index % this.notes.length] * relative_octave + 'hz';
+            this.playing[key] = note;
+            this.tone.triggerAttack(note);
         }
     }
 
