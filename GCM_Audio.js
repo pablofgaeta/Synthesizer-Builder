@@ -124,7 +124,7 @@ let AudioController = (function() {
 })();
 
 class ETSynth {
-    static keys = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'];
+    static keys = [ 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'' ];
     static default = {
         base : 440,
         polyphony : 10,
@@ -157,6 +157,11 @@ class ETSynth {
         };
 
         this.set_scale();
+    }
+
+    getKey(note) {
+        let i = this.notes.indexOf(note);
+        return i != -1 ? this.keys[i] : null; 
     }
 
     set_scale(divisions = this.divisions, base = this.settings.base) {
@@ -192,6 +197,14 @@ class ETSynth {
             this.playing[key] = this.notes[index] + 'hz';
             this.tone.triggerAttack(this.notes[index] + 'hz');
         }
+    }
+
+    __attack_by_hertz(note) {
+        this.tone.triggerAttack(note + 'hz');
+    }
+
+    __release_by_hertz(note) {
+        this.tone.triggerRelease(note + 'hz');
     }
 
     release(key) {

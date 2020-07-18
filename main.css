@@ -71,6 +71,16 @@ html, body, canvas, .scene, .synths {
     cursor : pointer;
 }
 
+.frequency-pad {
+    background-color : #9a9a9a;
+    padding : 25px;
+    margin : 10px;
+    border-radius : 10px;
+}
+
+.frequency-pad:hover {
+    background-color : #89cff0;
+}
 
 .synth-editor {
     width : 100%;
@@ -98,16 +108,19 @@ html, body, canvas, .scene, .synths {
 .hspace-s { padding : 8px; }
 
 /* COLORS */ 
-.bg-blue    { background-color : #89cff0;   }
-.blue       {            color : #89cff0;   }
-.bg-white   { background-color : #ffffff;   }
-.white      {            color : #ffffff;   }
-.bg-gray    { background-color : #9a9a9aff; }
-.gray       {            color : #9a9a9aff; }
-.bg-yellow  { background-color : #fdfd96;   }
-.yellow     {            color : #fdfd96;   }
-.bg-green   { background-color : #86eda6;   }
-.green      {            color : #86eda6;   }
+.bg-blue    { background-color : #89cff0; }
+.blue       {            color : #89cff0; }
+.bg-white   { background-color : #ffffff; }
+.white      {            color : #ffffff; }
+.bg-gray    { background-color : #9a9a9a; }
+.gray       {            color : #9a9a9a; }
+.bg-yellow  { background-color : #fdfd96; }
+.yellow     {            color : #fdfd96; }
+.bg-green   { background-color : #86eda6; }
+.green      {            color : #86eda6; }
+.bg-red     { background-color : #e19191; }
+.red        {            color : #e19191; }
+
 
 
 /* BUTTONS */
@@ -159,7 +172,7 @@ html, body, canvas, .scene, .synths {
     cursor: default;
 }
 
-.txt-xs { font-size : 15px; }
+.txt-xs { font-size : 20px; }
 .txt-s { font-size : 25px; }
 .txt-m { font-size : 50px; }
 .txt-l { font-size : 60px; }
