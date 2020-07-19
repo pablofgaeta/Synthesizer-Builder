@@ -175,8 +175,16 @@ function FrequenciesController(synth) {
 
             let pad           = document.createElement('button');
             pad.className   = 'button-l frequency-pad white txt-s flex-container-center';
-            pad.ontouchstart = pad.onmousedown = () => synth.__attack_by_hertz(note);
-            pad.ontouchend = pad.onmouseup   = () => synth.__release_by_hertz(note);
+            pad.ontouchstart = (event) => {
+                event.preventDefault();
+                synth.__attack_by_hertz(note);
+            }
+            pad.ontouchend = (event) => {
+                event.preventDefault();
+                synth.__release_by_hertz(note);
+            }
+            pad.onmousedown = () => synth.__attack_by_hertz(note);
+            pad.onmouseup   = () => synth.__release_by_hertz(note);
 
             let mapping       = document.createElement('div');
             mapping.className = 'txt-m frequency-mapping';
